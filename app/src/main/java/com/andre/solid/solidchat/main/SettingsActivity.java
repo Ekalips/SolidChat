@@ -5,11 +5,15 @@ import android.databinding.DataBindingUtil;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.andre.solid.solidchat.BR;
 import com.andre.solid.solidchat.R;
 import com.andre.solid.solidchat.data.AddQuestionRequest;
 import com.andre.solid.solidchat.data.Answer;
@@ -30,6 +34,7 @@ import io.realm.RealmResults;
 
 public class SettingsActivity extends AppCompatActivity {
 
+    private static final String TAG = SettingsActivity.class.getSimpleName();
     Realm realm;
     ActivitySettingsBinding binding;
     RealmResults<QuickQuestion> quickQuestions;
@@ -60,6 +65,29 @@ public class SettingsActivity extends AppCompatActivity {
         setSupportActionBar(binding.includeToolbar.toolbar);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        initSwipe();
+    }
+
+
+    private void initSwipe() {
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                QuickQuestion quickQuestion = binding.getUser().getQuickQuestions().get(viewHolder.getAdapterPosition());
+                request.getQuickQuestions().remove(quickQuestion);
+                binding.recyclerView.getAdapter().notifyItemRemoved(viewHolder.getAdapterPosition());
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(binding.recyclerView);
     }
 
     private void setQuickQuestionsToBinding(RealmResults<QuickQuestion> quickQuestions) {
@@ -108,6 +136,7 @@ public class SettingsActivity extends AppCompatActivity {
         User.getInstance().setName(request.getName());
 
         realm.beginTransaction();
+        realm.where(QuickQuestion.class).equalTo("author",User.getInstance().getMac()).findAll().deleteAllFromRealm();
         realm.insertOrUpdate(request.getQuickQuestions());
         realm.commitTransaction();
 

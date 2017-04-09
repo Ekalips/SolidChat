@@ -27,4 +27,5 @@
     <string name="hint_question_name">Question name</string>
     <string name="hint_question_answers">Question answers. Split with line breaks.</string>
     <string name="dialog_add_question_title">Add Quick Question</string>
+    <string name="no_quick_actions_holder">You don\'t have any QuickQuestions for now. Click "+" sign below to create one</string>
 </resources>

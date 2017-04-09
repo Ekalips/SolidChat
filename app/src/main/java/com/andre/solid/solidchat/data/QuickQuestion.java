@@ -96,4 +96,8 @@ public class QuickQuestion extends RealmObject {
     public int hashCode() {
         return question != null ? question.hashCode() : 0;
     }
+
+    public String getCompoundId() {
+        return compoundId;
+    }
 }

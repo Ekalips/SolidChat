@@ -40,13 +40,8 @@ public class QuestionsRecyclerViewAdapter extends RecyclerView.Adapter<BindingVi
 
     @Override
     public void setData(List<QuickQuestion> data) {
-        this.quickQuestions.clear();
-        this.quickQuestions.addAll(data);
+        this.quickQuestions = data;
 
-        if (this.quickQuestions.size() > 0)
-            notifyItemRangeChanged(0, this.quickQuestions.size() - 1);
-        else
-            notifyDataSetChanged();
-
+        notifyDataSetChanged();
     }
 }

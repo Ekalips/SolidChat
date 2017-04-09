@@ -136,6 +136,7 @@ public class ChatClientService extends Service {
         Log.e(TAG, "startClient: " + user.getQuickQuestions().size());
         String userJson = new GsonBuilder().create().toJson(new EventData(user));
         clientChannel.write(ByteBuffer.wrap(userJson.getBytes()));
+        realm.close();
 
         while (!stopService) {
             // wait for events

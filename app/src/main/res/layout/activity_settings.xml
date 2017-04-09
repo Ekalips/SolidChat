@@ -7,9 +7,6 @@
             name="user"
             type="com.andre.solid.solidchat.data.UserDataChangeRequest" />
 
-        <variable
-            name="questions"
-            type="java.util.List" />
     </data>
 
     <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -36,13 +33,13 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:paddingBottom="16dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
                 android:paddingTop="16dp">
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp">
 
                     <android.support.design.widget.TextInputEditText
                         android:layout_width="match_parent"
@@ -51,9 +48,23 @@
                         android:hint="@string/hint_name" />
                 </android.support.design.widget.TextInputLayout>
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/no_quick_actions_holder"
+                    android:layout_gravity="center"
+                    android:layout_margin="16dp"
+                    android:visibility="@{user.quickQuestions.size()==0}"
+                    android:gravity="center"/>
+
                 <android.support.v7.widget.RecyclerView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:id="@+id/recyclerView"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:clipToPadding="false"
+                    android:visibility="@{user.quickQuestions.size()>0}"
                     app:layoutManager="LinearLayoutManager"
                     app:adapter="@{QuestionsRecyclerViewAdapter.clazz}"
                     app:data="@{user.quickQuestions}"

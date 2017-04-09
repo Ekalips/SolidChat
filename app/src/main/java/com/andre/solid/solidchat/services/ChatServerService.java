@@ -177,6 +177,7 @@ public class ChatServerService extends Service {
 
         String userJson = new GsonBuilder().create().toJson(new EventData(user));
         channel.write(ByteBuffer.wrap(userJson.getBytes()));
+        realm.close();
 
         // register channel with selector for further IO
         dataMapper.put(channel, new ArrayList());
@@ -202,6 +203,7 @@ public class ChatServerService extends Service {
             Socket socket = channel.socket();
             SocketAddress remoteAddr = socket.getRemoteSocketAddress();
             Log.e(TAG, "Connection closed by client: " + remoteAddr);
+            selector.selectNow();
             channel.close();
             key.cancel();
             EventBus.getDefault().post(new ConnectionClosedEvent());
