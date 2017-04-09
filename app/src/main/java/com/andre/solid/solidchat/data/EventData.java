@@ -13,6 +13,7 @@ public class EventData {
     private int eventType;
     private User userData;
     private Message message;
+    private Attachment attachment;
 
     public EventData(Message message) {
         this.message = message;
@@ -31,6 +32,11 @@ public class EventData {
         EventData data = new EventData();
         data.eventType = EventType.TYPE_DESTROY;
         return data;
+    }
+
+    public EventData(Attachment attachment) {
+        this.attachment = attachment;
+        this.eventType = EventType.TYPE_ATTACHMENT;
     }
 
     public int getEventType() {
@@ -55,5 +61,9 @@ public class EventData {
 
     public void setMessage(Message message) {
         this.message = message;
+    }
+
+    public Attachment getAttachment() {
+        return attachment;
     }
 }

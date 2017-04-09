@@ -16,6 +16,7 @@ public class Message extends RealmObject{
     long date;
     private String message;
     private boolean isMine;
+    private String filePath;
 
 
     public Message() {
@@ -26,6 +27,7 @@ public class Message extends RealmObject{
         this.date = date;
         this.message = message;
     }
+
 
     public long getDate() {
         return date;
@@ -57,5 +59,17 @@ public class Message extends RealmObject{
 
     public boolean isMine() {
         return isMine;
+    }
+
+    public void setMine(boolean mine) {
+        isMine = mine;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }

@@ -3,17 +3,22 @@ package com.andre.solid.solidchat.services;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.support.annotation.IntDef;
 import android.util.Log;
 
+import com.andre.solid.solidchat.R;
+import com.andre.solid.solidchat.data.Attachment;
 import com.andre.solid.solidchat.data.EventData;
 import com.andre.solid.solidchat.data.EventType;
 import com.andre.solid.solidchat.data.Message;
 import com.andre.solid.solidchat.data.PartnerUserData;
 import com.andre.solid.solidchat.events.ConnectionClosedEvent;
+import com.andre.solid.solidchat.events.SendAttachmentEvent;
 import com.andre.solid.solidchat.events.SendMessageEvent;
 import com.andre.solid.solidchat.events.StopServiceEvent;
 import com.andre.solid.solidchat.events.UserReceivedEvent;
+import com.andre.solid.solidchat.stuff.Const;
 import com.andre.solid.solidchat.user.User;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -22,12 +27,16 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -54,6 +63,8 @@ public class ChatClientService extends Service {
     InetAddress ownerAddress;
     SocketChannel clientChannel;
 
+    boolean nextIsAttachment = false;
+    private Attachment lastAttachment;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -142,6 +153,10 @@ public class ChatClientService extends Service {
     //read from the socket channel
     private void read(SelectionKey key) throws IOException {
         SocketChannel channel = (SocketChannel) key.channel();
+        if (nextIsAttachment && lastAttachment != null) {
+            handleReceivedAttachment(channel);
+            return;
+        }
         ByteBuffer buffer = ByteBuffer.allocate(1024);
         int numRead = -1;
         numRead = channel.read(buffer);
@@ -189,7 +204,45 @@ public class ChatClientService extends Service {
                 onCloseServiceEvent(null);
                 break;
             }
+            case EventType.TYPE_ATTACHMENT: {
+                nextIsAttachment = true;
+                lastAttachment = eventData.getAttachment();
+                Message message = new Message();
+                message.setDate(eventData.getAttachment().getDate());
+                message.setMessage(getString(R.string.attachment_text, eventData.getAttachment().getAttachmentName()));
+                message.setMac(eventData.getAttachment().getMac());
+                realm.beginTransaction();
+                realm.insertOrUpdate(message);
+                realm.commitTransaction();
+                break;
+            }
         }
+        realm.close();
+    }
+
+    private void handleReceivedAttachment(SocketChannel channel) throws IOException {
+        File file = new File(Const.DEFAULT_STORAGE_DIR);
+        if (!file.exists()){
+            file.mkdirs();
+        }
+        file = new File(file,lastAttachment.getAttachmentName());
+        ByteBuffer bb=ByteBuffer.allocate(10000000);
+        int bytesRead= channel.read(bb);
+        FileOutputStream bout =new FileOutputStream(file);
+        FileChannel sbc=bout.getChannel();
+
+        while(bytesRead != -1){
+            bb.flip();
+            sbc.write(bb);
+            bb.compact();
+            bytesRead=channel.read(bb);
+        }
+
+        Realm realm = Realm.getDefaultInstance();
+        Message mess = realm.where(Message.class).equalTo("date",lastAttachment.getDate()).findFirst();
+        realm.beginTransaction();
+        mess.setFilePath(file.getPath());
+        realm.commitTransaction();
         realm.close();
     }
 
@@ -214,6 +267,34 @@ public class ChatClientService extends Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onSendAttachmentEvent(SendAttachmentEvent event){
+        try {
+            ByteBuffer nameBuffer=ByteBuffer.wrap(new Gson().toJson(new EventData(new Attachment(event.getFile().getName(),event.getMessage().getDate(),event.getMessage().getMac()))).getBytes());
+            clientChannel.write(nameBuffer);
+            nameBuffer.flip();
+
+            Thread.sleep(1000);
+
+            FileInputStream fout =new FileInputStream(event.getFile());
+            FileChannel sbc=fout.getChannel();
+
+
+            ByteBuffer buff=ByteBuffer.allocate((int) event.getFile().length());
+            int bytesread=sbc.read(buff);
+
+            while(bytesread != -1){
+                buff.flip();
+                clientChannel.write(buff);
+                buff.compact();
+                bytesread=sbc.read(buff);
+            }
+
+
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

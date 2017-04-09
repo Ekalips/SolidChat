@@ -7,4 +7,16 @@
     <string name="hint_enter_your_name">Enter your name</string>
     <string name="login_btn">Login</string>
     <string name="error_enter_name">Please enter your name</string>
+    <string name="attachment_text">Attachment: $1%s</string>
+
+    <string name="dialog_file_chooser_title">Choose file type</string>
+    <string name="mime_jpeg">image/jpeg</string>
+    <string name="mime_doxc">application/vnd.openxmlformats-officedocument.wordprocessingml.document</string>
+    <string name="mime_doc">application/msword</string>
+    <string name="mime_pdf">application/pdf</string>
+
+    <string name="permission_request_title">Permission required</string>
+    <string name="permission_request_message_storage">Please give permission to access your storage</string>
+    <string name="permission_request_message_camera">Please give permission to access your camera</string>
+    <string name="error_file_open">Error uploading file</string>
 </resources>
