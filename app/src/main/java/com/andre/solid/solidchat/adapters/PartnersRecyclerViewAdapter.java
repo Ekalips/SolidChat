@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import com.andre.solid.solidchat.R;
 import com.andre.solid.solidchat.data.PartnerUserData;
 import com.andre.solid.solidchat.databinding.RvItemPartnersBinding;
+import com.andre.solid.solidchat.events.FetchOfflineChatEvent;
 import com.andre.solid.solidchat.events.TryToConnectEvent;
 import com.andre.solid.solidchat.stuff.BindingViewHolder;
 import com.andre.solid.solidchat.stuff.ClickAdapter;
@@ -44,6 +45,12 @@ public class PartnersRecyclerViewAdapter extends RecyclerView.Adapter<BindingVie
             @Override
             public void onClick(View v) {
                 EventBus.getDefault().post(new TryToConnectEvent(data.get(holder.getAdapterPosition())));
+            }
+        });
+        holder.getBinding().setOnOfflineClick(new ClickAdapter() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getDefault().post(new FetchOfflineChatEvent(data.get(holder.getAdapterPosition())));
             }
         });
     }

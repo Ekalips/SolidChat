@@ -24,7 +24,7 @@
 
         <include
             layout="@layout/include_toolbar"
-            app:title='@{partner.name}' />
+            app:title='@{partner.displayName}' />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"

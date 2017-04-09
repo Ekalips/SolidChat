@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.andre.solid.solidchat.R;
 import com.andre.solid.solidchat.data.PartnerUserData;
+import com.andre.solid.solidchat.events.FetchOfflineChatEvent;
 import com.andre.solid.solidchat.events.P2PWifiConnectionEstabilishedEvent;
 import com.andre.solid.solidchat.events.TryToConnectEvent;
 import com.andre.solid.solidchat.receivers.WiFiBroadcastReceiver;
@@ -158,7 +159,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra(ChatActivity.EXTRA_IS_OWNER, isOwner);
         intent.putExtra(ChatActivity.EXTRA_OWNER_ID, ownerId);
-        intent.putExtra(ChatActivity.EXTRA_MAC, lastTriedMac);
         startActivityForResult(intent, REQUEST_ENTER_CHAT);
     }
 
@@ -183,5 +183,12 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(int reason) {
             }
         });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onFetchOfflineChatEvent(FetchOfflineChatEvent event) {
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.putExtra(ChatActivity.EXTRA_MAC, event.getData().getAddress());
+        startActivityForResult(intent, REQUEST_ENTER_CHAT);
     }
 }

@@ -53,6 +53,7 @@ public class ChatActivity extends AppCompatActivity {
     private String TAG = ChatActivity.class.getSimpleName();
     ActivityChatBinding binding;
 
+    String mac;
     Intent serviceIntent;
     Realm realm;
     boolean partnerFetched;
@@ -67,29 +68,47 @@ public class ChatActivity extends AppCompatActivity {
 
         isOwner = getIntent().getBooleanExtra(EXTRA_IS_OWNER, false);
         ownerAddress = (InetAddress) getIntent().getSerializableExtra(EXTRA_OWNER_ID);
-
-        if (ownerAddress == null) {
+        mac = getIntent().getStringExtra(EXTRA_MAC);
+        if (ownerAddress == null && mac == null) {
             Utils.showToastMessage(R.string.error_init_chat);
             finish();
             return;
         }
 
-        if (isOwner) {
-            serviceIntent = new Intent(this, ChatServerService.class);
-            serviceIntent.putExtra(ChatActivity.EXTRA_OWNER_ID, ownerAddress);
-            startService(serviceIntent);
-        } else {
-            serviceIntent = new Intent(this, ChatClientService.class);
-            serviceIntent.putExtra(ChatActivity.EXTRA_OWNER_ID, ownerAddress);
-            startService(serviceIntent);
+        if (mac != null && !mac.isEmpty()) {
+            onUserReceivedEvent(new UserReceivedEvent(mac));
         }
 
-        binding.sendBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tryToSendMessage();
+        if (ownerAddress != null) {
+
+            if (isOwner) {
+                serviceIntent = new Intent(this, ChatServerService.class);
+                serviceIntent.putExtra(ChatActivity.EXTRA_OWNER_ID, ownerAddress);
+                startService(serviceIntent);
+            } else {
+                serviceIntent = new Intent(this, ChatClientService.class);
+                serviceIntent.putExtra(ChatActivity.EXTRA_OWNER_ID, ownerAddress);
+                startService(serviceIntent);
             }
-        });
+
+            binding.sendBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    tryToSendMessage();
+                }
+            });
+
+            binding.attachBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Utils.showFileChooser(ChatActivity.this, REQUEST_FILE);
+                }
+            });
+
+        } else {
+            binding.sendBtn.setEnabled(false);
+            binding.attachBtn.setEnabled(false);
+        }
 
 
         binding.messageInputLayout.getViewTreeObserver().addOnGlobalLayoutListener(layoutListener);
@@ -98,12 +117,7 @@ public class ChatActivity extends AppCompatActivity {
         manager.setReverseLayout(true);
         binding.recyclerView.setLayoutManager(manager);
 
-        binding.attachBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Utils.showFileChooser(ChatActivity.this, REQUEST_FILE);
-            }
-        });
+
     }
 
     private void tryToSendMessage() {
@@ -230,7 +244,7 @@ public class ChatActivity extends AppCompatActivity {
                         Message messageToSend = new Message(User.getInstance().getMac(), System.currentTimeMillis(), file.getName());
                         Message messageToSave = new Message(currentPartner.getAddress(), System.currentTimeMillis(), file.getName());
                         messageToSave.setFilePath(file.getPath());
-                        EventBus.getDefault().post(new SendAttachmentEvent(messageToSend,file));
+                        EventBus.getDefault().post(new SendAttachmentEvent(messageToSend, file));
                         addMessageToRealm(messageToSave);
                     } else {
                         Utils.showToastMessage(R.string.error_file_open);
