@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <import type="com.google.android.flexbox.FlexDirection" />
+
+        <import type="android.support.v4.view.GravityCompat" />
+
+        <import type="com.andre.solid.solidchat.stuff.MessageUtils"/>
+
+        <variable
+            name="message"
+            type="com.andre.solid.solidchat.data.Message" />
+
+        <variable
+            name="same"
+            type="Boolean" />
+    </data>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@{same?@dimen/zero:@dimen/four}"
+            android:orientation="vertical"
+            android:visibility="@{message.message.length()>0}"
+            app:flexDirection="@{!message.mine?FlexDirection.ROW:FlexDirection.ROW_REVERSE,default = row}"
+            app:flexWrap="wrap"
+            app:justifyContent="space_between">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="@{!message.mine?GravityCompat.START:GravityCompat.END,default = start}"
+                android:orientation="horizontal"
+                android:paddingEnd="@{message.mine?@dimen/eight:@dimen/zero}"
+                android:paddingStart="@{!message.mine?@dimen/eight:@dimen/zero}"
+                app:layout_flexBasisPercent="80%"
+                app:layout_flexGrow="0.8">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@{same?@drawable/chat_bubble_center:message.mine?@drawable/chat_bubble_right:@drawable/chat_bubble_left}"
+                    android:gravity="center_vertical"
+                    android:text='@{message.message,default = "Message"}'
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    app:layout_marginLeft="@{!message.mine&amp;&amp;same?@dimen/d_10:@dimen/zero}"
+                    app:layout_marginRight="@{message.mine&amp;&amp;same?@dimen/d_10:@dimen/zero}" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.6"
+                android:gravity="center"
+                android:text='@{MessageUtils.getDateFromMessage(message),default = "14:88"}'
+                android:textSize="12sp"
+                app:layout_flexBasisPercent="20%"
+                app:layout_flexGrow="0.2" />
+
+        </com.google.android.flexbox.FlexboxLayout>
+    </LinearLayout>
+</layout>

@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">SolidChat</string>
+    <string name="error_init_chat">Error initialising chat</string>
+    <string name="enter_message_hint">Enter your message</string>
+    <string name="error_empty_message">Please, enter your message</string>
+    <string name="error_no_partner">Please, wait, your partner didn\'t connect yet</string>
+    <string name="hint_enter_your_name">Enter your name</string>
+    <string name="login_btn">Login</string>
+    <string name="error_enter_name">Please enter your name</string>
+</resources>

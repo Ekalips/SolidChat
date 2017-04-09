@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="zero">0dp</dimen>
+    <dimen name="two">2dp</dimen>
+    <dimen name="four">4dp</dimen>
+    <dimen name="eight">8dp</dimen>
+    <dimen name="sixteen">16dp</dimen>
+    <dimen name="d_24">24dp</dimen>
+    <dimen name="d_32">32dp</dimen>
+    <dimen name="d_64">64dp</dimen>
+    <dimen name="d_128">128dp</dimen>
+    <dimen name="d_160">128dp</dimen>
+
+    <dimen name="d_10_px">10px</dimen>
+    <dimen name="d_10">10dp</dimen>
+</resources>

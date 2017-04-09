@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+        <import type="com.andre.solid.solidchat.adapters.PartnersRecyclerViewAdapter"/>
+
+        <variable
+            name="data"
+            type="java.util.List"/>
+    </data>
+
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:fitsSystemWindows="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.andre.solid.solidchat.main.MainActivity">
+
+        <include layout="@layout/include_toolbar"
+            app:title='@{"Chats"}'/>
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:layoutManager="LinearLayoutManager"
+            app:data="@{data}"
+            app:adapter="@{PartnersRecyclerViewAdapter.clazz}"
+            tools:listitem="@layout/rv_item_partners"
+            app:divider='@{"vertical"}' />
+
+    </android.support.design.widget.CoordinatorLayout>
+</layout>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <import type="com.andre.solid.solidchat.adapters.MessagesRecyclerViewAdapter" />
+
+        <variable
+            name="partner"
+            type="com.andre.solid.solidchat.data.PartnerUserData" />
+
+        <variable
+            name="data"
+            type="java.util.List" />
+    </data>
+
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:context="com.andre.solid.solidchat.main.ChatActivity">
+
+        <include
+            layout="@layout/include_toolbar"
+            app:title='@{partner.name}' />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            app:adapter="@{MessagesRecyclerViewAdapter.clazz}"
+            app:data="@{data}"
+            app:layoutManager="LinearLayoutManager"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/messageInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            app:flexDirection="row"
+            app:flexWrap="wrap"
+            app:justifyContent="space_between">
+
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:layout_marginStart="16dp"
+                app:layout_alignSelf="center"
+                app:layout_flexBasisPercent="70%"
+                app:layout_flexGrow="0.7">
+
+                <EditText
+                    android:id="@+id/messageEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:background="@android:color/transparent"
+                    android:hint="@string/enter_message_hint"
+                    android:textSize="14sp" />
+            </android.support.v7.widget.CardView>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/sendBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="16dp"
+                android:clickable="true"
+                android:src="@drawable/ic_send"
+                app:fabSize="mini"
+                app:layout_alignSelf="center"
+                app:layout_flexBasisPercent="20%"
+                app:layout_flexGrow="0.2" />
+
+        </com.google.android.flexbox.FlexboxLayout>
+
+    </android.support.design.widget.CoordinatorLayout>
+</layout>
