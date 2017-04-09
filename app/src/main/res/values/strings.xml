@@ -19,4 +19,6 @@
     <string name="permission_request_message_storage">Please give permission to access your storage</string>
     <string name="permission_request_message_camera">Please give permission to access your camera</string>
     <string name="error_file_open">Error uploading file</string>
+    <string name="welcome_to_solidchat">Welcome to SolidChat</string>
+    <string name="no_chats_hint">No users detected in your network. Try to connect to another one, or wait for someone</string>
 </resources>

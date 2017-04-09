@@ -26,6 +26,8 @@
             layout="@layout/include_toolbar"
             app:title='@{partner.displayName}' />
 
+
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
@@ -67,7 +69,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_margin="8dp"
+                        android:padding="12dp"
                         android:background="@android:color/transparent"
                         android:hint="@string/enter_message_hint"
                         android:textSize="14sp" />

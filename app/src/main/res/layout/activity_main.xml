@@ -7,6 +7,10 @@
         <variable
             name="data"
             type="java.util.List"/>
+
+        <variable
+            name="user"
+            type="com.andre.solid.solidchat.user.User"/>
     </data>
 
     <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -18,11 +22,24 @@
         tools:context="com.andre.solid.solidchat.main.MainActivity">
 
         <include layout="@layout/include_toolbar"
-            app:title='@{"Chats"}'/>
+            app:title='@{user.name}'/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="@{data == null || data.size()==0}"
+            android:layout_margin="32dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textSize="14sp"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+            android:text="@string/no_chats_hint"/>
 
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:visibility="@{data.size()>0}"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             app:layoutManager="LinearLayoutManager"
             app:data="@{data}"

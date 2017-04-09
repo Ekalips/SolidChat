@@ -24,33 +24,49 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="64dp"
+                android:layout_width="120dp"
                 android:layout_height="64dp"
                 android:layout_margin="16dp"
+                android:layout_weight="1.2"
                 android:src="@mipmap/ic_launcher" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
+                android:text="@string/welcome_to_solidchat"/>
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:layout_margin="16dp"
                 android:layout_gravity="center">
 
                 <android.support.design.widget.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:inputType="textPersonName"
                     android:textColor="@color/white"
                     android:textColorHint="@color/white"
                     android:text="@={nameField}"
                     android:hint="@string/hint_enter_your_name" />
             </android.support.design.widget.TextInputLayout>
 
-            <Button
+            <android.support.design.widget.FloatingActionButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/loginBtn"
                 android:layout_margin="16dp"
-                android:background="@drawable/stroked_button"
-                android:text="@string/login_btn"
-                android:textColor="@color/white" />
+                app:fabSize="normal"
+                android:src="@drawable/ic_arrow_next_black"
+                android:contentDescription="@string/login_btn"/>
+
+            <android.support.v4.widget.Space
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"/>
 
         </LinearLayout>
     </android.support.design.widget.CoordinatorLayout>

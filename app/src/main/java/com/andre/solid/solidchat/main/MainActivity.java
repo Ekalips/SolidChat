@@ -20,6 +20,7 @@ import com.andre.solid.solidchat.events.P2PWifiConnectionEstabilishedEvent;
 import com.andre.solid.solidchat.events.TryToConnectEvent;
 import com.andre.solid.solidchat.receivers.WiFiBroadcastReceiver;
 import com.andre.solid.solidchat.databinding.ActivityMainBinding;
+import com.andre.solid.solidchat.user.User;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -65,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (partnerUserDatas.isLoaded() && partnerUserDatas.isValid())
             binding.setData(partnerUserDatas);
+
+        binding.setUser(User.getInstance());
     }
 
     BroadcastReceiver receiver;
