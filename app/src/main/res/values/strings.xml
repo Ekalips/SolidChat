@@ -21,4 +21,10 @@
     <string name="error_file_open">Error uploading file</string>
     <string name="welcome_to_solidchat">Welcome to SolidChat</string>
     <string name="no_chats_hint">No users detected in your network. Try to connect to another one, or wait for someone</string>
+    <string name="menu_settings">Settings</string>
+    <string name="hint_name">Name</string>
+    <string name="menu_save">Save</string>
+    <string name="hint_question_name">Question name</string>
+    <string name="hint_question_answers">Question answers. Split with line breaks.</string>
+    <string name="dialog_add_question_title">Add Quick Question</string>
 </resources>

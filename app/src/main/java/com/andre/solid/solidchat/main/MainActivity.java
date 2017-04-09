@@ -11,6 +11,8 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.andre.solid.solidchat.R;
@@ -68,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
             binding.setData(partnerUserDatas);
 
         binding.setUser(User.getInstance());
+
+        setSupportActionBar(binding.includeToolbar.toolbar);
     }
 
     BroadcastReceiver receiver;
@@ -85,6 +89,29 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(receiver, intentFilter);
         EventBus.getDefault().register(this);
         launchPeerDiscovering();
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.partners_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_settings:{
+                openSettingsActivity();
+                break;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void openSettingsActivity() {
+        Intent intent = new Intent(this,SettingsActivity.class);
+        startActivity(intent);
     }
 
     private void launchPeerDiscovering() {

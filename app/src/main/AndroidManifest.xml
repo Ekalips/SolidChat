@@ -11,9 +11,8 @@
     <uses-permission
         android:name="android.permission.INTERNET"
         android:required="true" />
-
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".MyApplication"
@@ -23,9 +22,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".main.MainActivity">
-
-        </activity>
+        <activity android:name=".main.MainActivity"></activity>
 
         <receiver
             android:name=".receivers.WiFiBroadcastReceiver"
@@ -43,9 +40,11 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".auth.LoginActivity"
-            android:theme="@style/ThemeWithBackground"/>
-        <activity android:name=".welcome.SplashScreenActivity"
+        <activity
+            android:name=".auth.LoginActivity"
+            android:theme="@style/ThemeWithBackground" />
+        <activity
+            android:name=".welcome.SplashScreenActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -53,6 +52,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".main.SettingsActivity"></activity>
     </application>
 
 </manifest>

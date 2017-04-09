@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
@@ -116,6 +117,10 @@ public class ChatActivity extends AppCompatActivity {
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setReverseLayout(true);
         binding.recyclerView.setLayoutManager(manager);
+
+        setSupportActionBar(binding.includeToolbar.toolbar);
+        if (getSupportActionBar()!=null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
     }
@@ -256,5 +261,16 @@ public class ChatActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:{
+                onBackPressed();
+                break;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.andre.solid.solidchat.MyApplication;
+import com.andre.solid.solidchat.data.QuickQuestion;
 
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -19,7 +21,6 @@ public class User {
     private String name;
     private String image;
     private String mac;
-
     public User(String name, String mac, String image) {
         this.name = name;
         this.mac = mac;
@@ -66,6 +67,6 @@ public class User {
 
 
     enum Keys {
-        name, image, mac;
+        name, image, mac,questions;
     }
 }
