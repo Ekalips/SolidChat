@@ -51,7 +51,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        quickQuestions = realm.where(QuickQuestion.class).findAllAsync();
+        quickQuestions = realm.where(QuickQuestion.class).equalTo("author", User.getInstance().getMac()).findAllAsync();
         quickQuestions.addChangeListener(questionsChangeListener);
 
         if (quickQuestions.isLoaded())
@@ -160,6 +160,6 @@ public class SettingsActivity extends AppCompatActivity {
                 addQuestionRequest.getQuestionAnswers().trim().split(System.lineSeparator())) {
             answers.add(new Answer(s));
         }
-        request.addQuestionRequest(new QuickQuestion(addQuestionRequest.getQuestionName(), answers));
+        request.addQuestionRequest(new QuickQuestion(addQuestionRequest.getQuestionName(), answers, User.getInstance().getMac()));
     }
 }

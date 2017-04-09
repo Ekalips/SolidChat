@@ -14,15 +14,20 @@ import io.realm.annotations.PrimaryKey;
  */
 
 public class QuickQuestion extends RealmObject {
-    @PrimaryKey
+
     private String question;
     private RealmList<Answer> answers;
+    private String author;
+    @PrimaryKey
+    private String compoundId;
 
     public QuickQuestion() {
     }
 
     public QuickQuestion(QuickQuestion quickQuestion) {
         this.question = quickQuestion.getQuestion();
+        this.compoundId = quickQuestion.geCompoundId();
+        this.author = quickQuestion.getAuthor();
         this.answers = new RealmList<>();
         for (Answer q :
                 quickQuestion.getAnswers()) {
@@ -30,9 +35,15 @@ public class QuickQuestion extends RealmObject {
         }
     }
 
-    public QuickQuestion(String question, RealmList<Answer> answers) {
+    private String geCompoundId() {
+        return compoundId;
+    }
+
+    public QuickQuestion(String question, RealmList<Answer> answers, String author) {
         this.question = question;
         this.answers = answers;
+        this.author = author;
+        compoundId = author + question;
     }
 
 
@@ -54,12 +65,20 @@ public class QuickQuestion extends RealmObject {
 
     public String getStrAnswers() {
         StringBuilder builder = new StringBuilder();
-        for (int i = 0;i<answers.size();i++) {
+        for (int i = 0; i < answers.size(); i++) {
             builder.append(answers.get(i).getAnswer());
-            if (i!=answers.size()-1)
+            if (i != answers.size() - 1)
                 builder.append(", ");
         }
         return builder.toString();
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.andre.solid.solidchat.data;
 
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -16,6 +17,7 @@ public class PartnerUserData extends RealmObject {
     private boolean isInNetwork;
     private int connectionStatus;
     private String image;
+    private RealmList<QuickQuestion> quickQuestions;
 
     public PartnerUserData() {
     }
@@ -100,6 +102,15 @@ public class PartnerUserData extends RealmObject {
     @Override
     public int hashCode() {
         return address != null ? address.hashCode() : 0;
+    }
+
+    public RealmList<QuickQuestion> getQuickQuestions() {
+        return quickQuestions;
+    }
+
+    public void setQuickQuestions(RealmList<QuickQuestion> quickQuestions) {
+        this.quickQuestions.clear();
+        this.quickQuestions.addAll(quickQuestions);
     }
 
     public enum ConnectionStatus{

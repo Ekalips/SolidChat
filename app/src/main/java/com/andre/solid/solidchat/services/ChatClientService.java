@@ -13,7 +13,9 @@ import com.andre.solid.solidchat.data.EventData;
 import com.andre.solid.solidchat.data.EventType;
 import com.andre.solid.solidchat.data.Message;
 import com.andre.solid.solidchat.data.PartnerUserData;
+import com.andre.solid.solidchat.data.QuickQuestion;
 import com.andre.solid.solidchat.events.ConnectionClosedEvent;
+import com.andre.solid.solidchat.events.MessageReceivedEvent;
 import com.andre.solid.solidchat.events.SendAttachmentEvent;
 import com.andre.solid.solidchat.events.SendMessageEvent;
 import com.andre.solid.solidchat.events.StopServiceEvent;
@@ -46,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 
 import static com.andre.solid.solidchat.main.ChatActivity.EXTRA_OWNER_ID;
 
@@ -123,8 +126,16 @@ public class ChatClientService extends Service {
 
         System.out.println("Client... started");
 
-        String user = new GsonBuilder().create().toJson(new EventData(User.getInstance()));
-        clientChannel.write(ByteBuffer.wrap(user.getBytes()));
+        User user = User.getInstance();
+        Realm realm = Realm.getDefaultInstance();
+        user.getQuickQuestions().clear();
+        for (QuickQuestion q :
+                realm.where(QuickQuestion.class).equalTo("author", User.getInstance().getMac()).findAll()) {
+            user.getQuickQuestions().add(new QuickQuestion(q));
+        }
+        Log.e(TAG, "startClient: " + user.getQuickQuestions().size());
+        String userJson = new GsonBuilder().create().toJson(new EventData(user));
+        clientChannel.write(ByteBuffer.wrap(userJson.getBytes()));
 
         while (!stopService) {
             // wait for events
@@ -189,6 +200,13 @@ public class ChatClientService extends Service {
                 PartnerUserData partnerUserData = realm.where(PartnerUserData.class).equalTo("address", eventData.getUserData().getMac()).findFirst();
                 partnerUserData.setName(eventData.getUserData().getName());
                 partnerUserData.setImage(eventData.getUserData().getImage());
+                RealmList<QuickQuestion> qqs = new RealmList<>();
+                for (QuickQuestion q :
+                        eventData.getUserData().getQuickQuestions()) {
+                    if (q.getAuthor().equals(partnerUserData.getAddress()) && !qqs.contains(q))
+                        qqs.add(q);
+                }
+                partnerUserData.setQuickQuestions(qqs);
                 realm.commitTransaction();
                 break;
             }
@@ -198,6 +216,7 @@ public class ChatClientService extends Service {
                 realm.beginTransaction();
                 realm.insertOrUpdate(message);
                 realm.commitTransaction();
+                EventBus.getDefault().post(new MessageReceivedEvent(message.getMessage()));
                 break;
             }
             case EventType.TYPE_DESTROY: {
@@ -222,24 +241,24 @@ public class ChatClientService extends Service {
 
     private void handleReceivedAttachment(SocketChannel channel) throws IOException {
         File file = new File(Const.DEFAULT_STORAGE_DIR);
-        if (!file.exists()){
+        if (!file.exists()) {
             file.mkdirs();
         }
-        file = new File(file,lastAttachment.getAttachmentName());
-        ByteBuffer bb=ByteBuffer.allocate(10000000);
-        int bytesRead= channel.read(bb);
-        FileOutputStream bout =new FileOutputStream(file);
-        FileChannel sbc=bout.getChannel();
+        file = new File(file, lastAttachment.getAttachmentName());
+        ByteBuffer bb = ByteBuffer.allocate(10000000);
+        int bytesRead = channel.read(bb);
+        FileOutputStream bout = new FileOutputStream(file);
+        FileChannel sbc = bout.getChannel();
 
-        while(bytesRead != -1){
+        while (bytesRead != -1) {
             bb.flip();
             sbc.write(bb);
             bb.compact();
-            bytesRead=channel.read(bb);
+            bytesRead = channel.read(bb);
         }
 
         Realm realm = Realm.getDefaultInstance();
-        Message mess = realm.where(Message.class).equalTo("date",lastAttachment.getDate()).findFirst();
+        Message mess = realm.where(Message.class).equalTo("date", lastAttachment.getDate()).findFirst();
         realm.beginTransaction();
         mess.setFilePath(file.getPath());
         realm.commitTransaction();
@@ -270,26 +289,26 @@ public class ChatClientService extends Service {
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onSendAttachmentEvent(SendAttachmentEvent event){
+    public void onSendAttachmentEvent(SendAttachmentEvent event) {
         try {
-            ByteBuffer nameBuffer=ByteBuffer.wrap(new Gson().toJson(new EventData(new Attachment(event.getFile().getName(),event.getMessage().getDate(),event.getMessage().getMac()))).getBytes());
+            ByteBuffer nameBuffer = ByteBuffer.wrap(new Gson().toJson(new EventData(new Attachment(event.getFile().getName(), event.getMessage().getDate(), event.getMessage().getMac()))).getBytes());
             clientChannel.write(nameBuffer);
             nameBuffer.flip();
 
             Thread.sleep(1000);
 
-            FileInputStream fout =new FileInputStream(event.getFile());
-            FileChannel sbc=fout.getChannel();
+            FileInputStream fout = new FileInputStream(event.getFile());
+            FileChannel sbc = fout.getChannel();
 
 
-            ByteBuffer buff=ByteBuffer.allocate((int) event.getFile().length());
-            int bytesread=sbc.read(buff);
+            ByteBuffer buff = ByteBuffer.allocate((int) event.getFile().length());
+            int bytesread = sbc.read(buff);
 
-            while(bytesread != -1){
+            while (bytesread != -1) {
                 buff.flip();
                 clientChannel.write(buff);
                 buff.compact();
-                bytesread=sbc.read(buff);
+                bytesread = sbc.read(buff);
             }
 
 

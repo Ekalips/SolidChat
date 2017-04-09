@@ -8,17 +8,23 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
 import com.andre.solid.solidchat.R;
 import com.andre.solid.solidchat.adapters.MessagesRecyclerViewAdapter;
+import com.andre.solid.solidchat.data.Answer;
 import com.andre.solid.solidchat.data.Attachment;
 import com.andre.solid.solidchat.data.Message;
 import com.andre.solid.solidchat.data.PartnerUserData;
+import com.andre.solid.solidchat.data.QuickQuestion;
 import com.andre.solid.solidchat.databinding.ActivityChatBinding;
 import com.andre.solid.solidchat.events.ConnectionClosedEvent;
+import com.andre.solid.solidchat.events.MessageReceivedEvent;
+import com.andre.solid.solidchat.events.OnQuickAnswerClick;
 import com.andre.solid.solidchat.events.SendAttachmentEvent;
 import com.andre.solid.solidchat.events.SendMessageEvent;
 import com.andre.solid.solidchat.events.StopServiceEvent;
@@ -36,6 +42,8 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
@@ -95,7 +103,7 @@ public class ChatActivity extends AppCompatActivity {
             binding.sendBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    tryToSendMessage();
+                    tryToSendMessage(binding.messageEt.getText().toString());
                 }
             });
 
@@ -119,25 +127,28 @@ public class ChatActivity extends AppCompatActivity {
         binding.recyclerView.setLayoutManager(manager);
 
         setSupportActionBar(binding.includeToolbar.toolbar);
-        if (getSupportActionBar()!=null)
+        if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
     }
 
-    private void tryToSendMessage() {
-        if (binding.messageEt.getText().toString().trim().length() > 0) {
+    private boolean tryToSendMessage(String message) {
+        if (message.trim().length() > 0) {
             if (partnerFetched) {
-                Message messageToSend = new Message(User.getInstance().getMac(), System.currentTimeMillis(), binding.messageEt.getText().toString());
-                Message messageToSave = new Message(currentPartner.getAddress(), System.currentTimeMillis(), binding.messageEt.getText().toString());
+                Message messageToSend = new Message(User.getInstance().getMac(), System.currentTimeMillis(), message);
+                Message messageToSave = new Message(currentPartner.getAddress(), System.currentTimeMillis(), message);
                 EventBus.getDefault().post(new SendMessageEvent(messageToSend));
                 addMessageToRealm(messageToSave);
                 binding.messageEt.setText("");
+                return true;
             } else {
                 Utils.showToastMessage(R.string.error_no_partner);
+                return false;
             }
         } else {
             Utils.showToastMessage(R.string.error_empty_message);
+            return false;
         }
     }
 
@@ -197,7 +208,12 @@ public class ChatActivity extends AppCompatActivity {
         public void onChange(PartnerUserData element) {
             partnerFetched = true;
             binding.setPartner(element);
-
+            List<String> answer = new ArrayList<>();
+            for (QuickQuestion q :
+                    element.getQuickQuestions()) {
+                answer.add(q.getQuestion());
+            }
+            binding.setQickAnswers(answer);
         }
     };
 
@@ -263,10 +279,34 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onQuickAnswerClick(OnQuickAnswerClick answerClick) {
+        if (tryToSendMessage(answerClick.getAnswer())) {
+            binding.setQickAnswers(new ArrayList());
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageReceivedEvent(MessageReceivedEvent event) {
+        for (QuickQuestion q :
+                User.getInstance().getQuickQuestions()) {
+            if (TextUtils.equals(q.getQuestion(), event.getMessage())) {
+                List<String> answers = new ArrayList<>();
+                for (Answer a :
+                        q.getAnswers()) {
+                    answers.add(a.getAnswer());
+                }
+                binding.setQickAnswers(answers);
+                return;
+            }
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case android.R.id.home:{
+        switch (item.getItemId()) {
+            case android.R.id.home: {
                 onBackPressed();
                 break;
             }

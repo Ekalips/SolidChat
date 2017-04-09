@@ -12,7 +12,9 @@ import com.andre.solid.solidchat.data.EventData;
 import com.andre.solid.solidchat.data.EventType;
 import com.andre.solid.solidchat.data.Message;
 import com.andre.solid.solidchat.data.PartnerUserData;
+import com.andre.solid.solidchat.data.QuickQuestion;
 import com.andre.solid.solidchat.events.ConnectionClosedEvent;
+import com.andre.solid.solidchat.events.MessageReceivedEvent;
 import com.andre.solid.solidchat.events.SendAttachmentEvent;
 import com.andre.solid.solidchat.events.SendMessageEvent;
 import com.andre.solid.solidchat.events.StopServiceEvent;
@@ -47,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 
 import static com.andre.solid.solidchat.main.ChatActivity.EXTRA_OWNER_ID;
 
@@ -163,8 +166,17 @@ public class ChatServerService extends Service {
         SocketAddress remoteAddr = socket.getRemoteSocketAddress();
         System.out.println("Connected to: " + remoteAddr);
 
-        String user = new GsonBuilder().create().toJson(new EventData(User.getInstance()));
-        channel.write(ByteBuffer.wrap(user.getBytes()));
+        User user = User.getInstance();
+        Realm realm = Realm.getDefaultInstance();
+        user.getQuickQuestions().clear();
+        for (QuickQuestion q :
+                realm.where(QuickQuestion.class).equalTo("author", User.getInstance().getMac()).findAll()) {
+            user.getQuickQuestions().add(new QuickQuestion(q));
+        }
+        Log.e(TAG, "startServer: " + user.getQuickQuestions().size());
+
+        String userJson = new GsonBuilder().create().toJson(new EventData(user));
+        channel.write(ByteBuffer.wrap(userJson.getBytes()));
 
         // register channel with selector for further IO
         dataMapper.put(channel, new ArrayList());
@@ -181,7 +193,7 @@ public class ChatServerService extends Service {
         nextIsAttachment = false;
         lastAttachment = null;
 
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        ByteBuffer buffer = ByteBuffer.allocate(2048);
         int numRead = -1;
         numRead = channel.read(buffer);
 
@@ -239,6 +251,13 @@ public class ChatServerService extends Service {
                 PartnerUserData partnerUserData = realm.where(PartnerUserData.class).equalTo("address", eventData.getUserData().getMac()).findFirst();
                 partnerUserData.setName(eventData.getUserData().getName());
                 partnerUserData.setImage(eventData.getUserData().getImage());
+                RealmList<QuickQuestion> qqs = new RealmList<>();
+                for (QuickQuestion q :
+                        eventData.getUserData().getQuickQuestions()) {
+                    if (q.getAuthor().equals(partnerUserData.getAddress()) && !qqs.contains(q))
+                        qqs.add(q);
+                }
+                partnerUserData.setQuickQuestions(qqs);
                 realm.commitTransaction();
                 break;
             }
@@ -248,6 +267,8 @@ public class ChatServerService extends Service {
                 realm.beginTransaction();
                 realm.insertOrUpdate(message);
                 realm.commitTransaction();
+                EventBus.getDefault().post(new MessageReceivedEvent(message.getMessage()));
+
                 break;
             }
             case EventType.TYPE_DESTROY: {
