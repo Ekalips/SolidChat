@@ -61,17 +61,22 @@ public class PartnersRecyclerViewAdapter extends RecyclerView.Adapter<BindingVie
     }
 
     @Override
-    public void setData(List<PartnerUserData> newData) {
+    public void setData(List<PartnerUserData> data) {
 
-//        DiffUtil.DiffResult diffUtilCallback =  DiffUtil.calculateDiff(new PartnersDiffUtil(data,newData),false);
+        List<PartnerUserData> newData = new ArrayList<>();
+        for (PartnerUserData pD :
+                data) {
+            newData.add(new PartnerUserData(pD));
+        }
+//        DiffUtil.DiffResult diffUtilCallback =  DiffUtil.calculateDiff(new PartnersDiffUtil(this.data,newData),false);
 //        diffUtilCallback.dispatchUpdatesTo(this);
 
-        this.data = new ArrayList<>(newData);
-
-        if (newData.size()>0)
-            notifyItemRangeChanged(0,newData.size());
+        if (data.size()>0)
+            notifyItemRangeChanged(0,data.size());
         else
             notifyDataSetChanged();
+
+        this.data = newData;
     }
 
 

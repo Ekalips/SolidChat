@@ -28,6 +28,16 @@ public class PartnerUserData extends RealmObject {
         this.connectionStatus = connectionStatus;
     }
 
+    public PartnerUserData(PartnerUserData pD) {
+        this.address = pD.getAddress();
+        this.connectionStatus = pD.getConnectionStatus();
+        this.deviceName = pD.getDeviceName();
+        this.name = pD.getName();
+        this.isInNetwork = pD.isInNetwork();
+        this.image = pD.getImage();
+        this.quickQuestions = pD.getQuickQuestions();
+    }
+
     public String getAddress() {
         return address;
     }
@@ -40,11 +50,10 @@ public class PartnerUserData extends RealmObject {
         return deviceName;
     }
 
-    public String getDisplayName(){
-        if (name!=null && !name.isEmpty()){
+    public String getDisplayName() {
+        if (name != null && !name.isEmpty()) {
             return name;
-        }
-        else
+        } else
             return getDeviceName();
     }
 
@@ -68,7 +77,7 @@ public class PartnerUserData extends RealmObject {
         isInNetwork = inNetwork;
     }
 
-    public String getConnectionStatusString(){
+    public String getConnectionStatusString() {
         return ConnectionStatus.fromInt(connectionStatus).toString();
     }
 
@@ -113,8 +122,8 @@ public class PartnerUserData extends RealmObject {
         this.quickQuestions.addAll(quickQuestions);
     }
 
-    public enum ConnectionStatus{
-        connected(0),invited(1),failed(2),available(3),unavailable(4), undefined(-1);
+    public enum ConnectionStatus {
+        connected(0), invited(1), failed(2), available(3), unavailable(4), undefined(-1);
 //        public static final int CONNECTED   = 0;
 //        public static final int INVITED     = 1;
 //        public static final int FAILED      = 2;
@@ -122,20 +131,20 @@ public class PartnerUserData extends RealmObject {
 //        public static final int UNAVAILABLE = 4;
 
         int status;
+
         ConnectionStatus(int status) {
             this.status = status;
         }
 
-        public static ConnectionStatus fromInt(int status){
+        public static ConnectionStatus fromInt(int status) {
             for (ConnectionStatus connectionStatus :
                     ConnectionStatus.values()) {
-                if (connectionStatus.status == status){
+                if (connectionStatus.status == status) {
                     return connectionStatus;
                 }
             }
             return undefined;
         }
-
 
 
         public int getStatus() {
